@@ -6,7 +6,18 @@
 
 - **Content-Type**: `application/json`
 - **Auth**: TBD (MVP may start unauthenticated; add auth headers once `docs/architecture.md` defines the auth approach)
-- **Error shape**: TBD (standardize once implementation starts)
+- **Error shape** (non-2xx):
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR | NOT_FOUND | UPSTREAM_ERROR | INTERNAL_ERROR",
+    "message": "string (optional)",
+    "details": {}
+  }
+}
+```
 
 ## Create Profile
 
@@ -63,6 +74,30 @@
     "text": "string",
     "model": "string",
     "promptVersion": "string"
+  }
+}
+```
+
+## Save Final Backstory
+
+### PUT `/profiles/{userId}/backstory`
+
+#### Request body
+
+```json
+{
+  "text": "string"
+}
+```
+
+#### Response body (200)
+
+```json
+{
+  "success": true,
+  "backstory": {
+    "text": "string",
+    "updatedAt": "string"
   }
 }
 ```
