@@ -4,6 +4,20 @@ import request from "supertest";
 import { createApp } from "../src/server.js";
 
 describe("MVP endpoints", () => {
+  it("GET /openapi.json returns OpenAPI spec with core paths", async () => {
+    process.env.DDB_TABLE_NAME = "test";
+    process.env.BEDROCK_MODEL_ID = "test";
+
+    const app = createApp();
+    const res = await request(app).get("/openapi.json");
+
+    expect(res.status).toBe(200);
+    expect(res.body.openapi).toBe("3.0.3");
+    expect(res.body.paths["/profiles"].post).toBeDefined();
+    expect(res.body.paths["/profiles/{userId}/generate-backstory"].post).toBeDefined();
+    expect(res.body.paths["/profiles/{userId}/backstory"].put).toBeDefined();
+  });
+
   it("POST /profiles validates input", async () => {
     process.env.DDB_TABLE_NAME = "test";
     process.env.BEDROCK_MODEL_ID = "test";

@@ -1,8 +1,13 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 import express from "express";
 import pinoHttp from "pino-http";
+import swaggerUi from "swagger-ui-express";
 import { v7 as uuidv7 } from "uuid";
 
 import { readEnv } from "./config/env.js";
+import { openApiSpec } from "./openapi.js";
 import { createDynamoDbDocumentClient } from "./clients/dynamodbClient.js";
 import { BedrockClient } from "./clients/bedrockClient.js";
 import { buildBackstoryRouter } from "./routes/backstory.js";
@@ -68,6 +73,8 @@ export function createApp(overrides?: {
   app.use(buildProfilesRouter({ profileService }));
   app.use(buildBackstoryRouter({ backstoryService }));
   app.get("/health", (_req, res) => res.json({ ok: true }));
+  app.get("/openapi.json", (_req, res) => res.json(openApiSpec));
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
   app.use((_req, res) => {
     res.status(404).json({ success: false, error: { code: "NOT_FOUND" } });
@@ -95,8 +102,12 @@ export function createApp(overrides?: {
   return app;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  // Validate env at startup (local-first MVP).
+// Run server only when this file is the entry point (e.g. tsx watch src/server.ts).
+const currentPath = fileURLToPath(import.meta.url);
+const entryPath = process.argv[1] ? path.resolve(process.cwd(), process.argv[1]) : "";
+if (entryPath === currentPath) {
+  const { config } = await import("dotenv");
+  config(); // load .env from backend root so npm run dev works with a .env file
   const port = Number(process.env.PORT ?? 3000);
   createApp().listen(port, () => {
     logger.info({ port }, "Server listening");
