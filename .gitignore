@@ -1,0 +1,38 @@
+# macOS
+.DS_Store
+
+# Node / JS
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraform.lock.hcl
+
+# IDE
+.vscode/
+.idea/
+
+# Cursor / temp
+.cursor/tmp/
